@@ -11,7 +11,7 @@ import {
   Code2,
   Globe,
   Terminal,
-  Github,
+  GitBranch,
   MessageCircle,
   X,
   Check,
@@ -74,7 +74,7 @@ const initialIntegrations: Integration[] = [
     actionLabel: "Connect",
     actionVariant: "primary",
     requiresAuth: true,
-    icon: <Github className="size-5 text-zinc-300" />,
+    icon: <GitBranch className="size-5 text-zinc-300" />,
     configFields: [
       { label: "GitHub Username", placeholder: "your-username", value: "" },
       { label: "Personal Access Token", placeholder: "ghp_xxxxxxxxxxxx", value: "" },
