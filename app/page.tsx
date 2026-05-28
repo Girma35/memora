@@ -1,5 +1,6 @@
 import { NavBar } from "@/components/nav-bar";
 import { Lightbulb, ExternalLink, FileText, AlertCircle, Play, CheckCircle, Cloud, Terminal, AlignLeft, Link as LinkIcon, Search, GitBranch, Info, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
 	return (
@@ -34,9 +35,9 @@ export default function Home() {
 								<p className="text-white text-sm">Verify token refresh logic in auth.ts</p>
 							</div>
 						</div>
-						<button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black px-5 py-2 rounded-md text-sm font-semibold transition-colors">
+						<Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black px-5 font-semibold">
 							Quick continue
-						</button>
+						</Button>
 					</div>
 				</div>
 
@@ -44,9 +45,9 @@ export default function Home() {
 				<div className="rounded-xl border border-white/5 bg-[#141414] p-6 flex flex-col">
 					<div className="flex items-center justify-between mb-4">
 						<p className="text-[11px] font-bold text-[#00E5FF] tracking-widest uppercase">Ongoing Task</p>
-						<button className="size-8 flex items-center justify-center rounded-md bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10 transition">
+						<Button variant="ghost" size="icon" className="size-8 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10">
 							<ExternalLink className="size-4" />
-						</button>
+						</Button>
 					</div>
 					
 					<h2 className="text-lg text-white font-medium mb-3">Authentication Refactor</h2>
@@ -69,9 +70,9 @@ export default function Home() {
 						</p>
 					</div>
 
-					<button className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-medium transition-colors">
+					<Button variant="outline" className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white h-12">
 						<Play className="size-4" /> Quick Continue
-					</button>
+					</Button>
 				</div>
 
 				{/* 3. AI Daily Summary */}

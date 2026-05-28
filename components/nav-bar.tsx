@@ -36,12 +36,12 @@ export function NavBar() {
 				<Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-semibold rounded-md px-6">
 					Resume Session
 				</Button>
-				<button className="flex items-center justify-center size-10 rounded-full hover:bg-white/10 transition-colors cursor-pointer text-zinc-400 hover:text-white border-0 outline-none">
-					<Bell className="size-5" />
-				</button>
-				<button className="flex items-center justify-center size-10 rounded-full bg-white/5 border border-white/10 overflow-hidden cursor-pointer hover:bg-white/10 transition-colors">
-					<User className="size-5 text-zinc-400 hover:text-white" />
-				</button>
+				<Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-zinc-400 hover:text-white">
+					<Bell />
+				</Button>
+				<Button variant="ghost" size="icon" className="rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-zinc-400 hover:text-white">
+					<User />
+				</Button>
 			</div>
 		</header>
 	);
