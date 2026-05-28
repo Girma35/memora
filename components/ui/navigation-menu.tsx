@@ -159,9 +159,8 @@ export const NAVIGATION_LIST = [
 	{ title: "Session", href: "/session" },
 	{ title: "AI Chat", href: "/ai-chat" },
 	{ title: "Project Detail", href: "/project-detail" },
-	{ title: "Knowledge Graph", href: "/knowledge-graph" },
 	{ title: "Search & Recall", href: "/search-recall" },
-	{ title: "Daily / Weekly Review+Settings & Integrations", href: "/review-settings" },
+	{ title: "Settings", href: "/settings" },
 ];
 
 export {
