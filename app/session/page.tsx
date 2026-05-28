@@ -53,9 +53,6 @@ export default function SessionPage() {
             </Link>
           </Button>
           <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/insights"><BarChart2 className="size-4" /> Insights</Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
             <Link href="/ai-chat"><MessageSquare className="size-4" /> AI Chat</Link>
           </Button>
         </aside>

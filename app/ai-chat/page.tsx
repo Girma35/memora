@@ -54,9 +54,6 @@ export default function AIChatPage() {
               <History className="size-4" /> Memory
             </Link>
           </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/insights"><BarChart2 className="size-4" /> Insights</Link>
-          </Button>
           <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-[#00E5FF] bg-white/5 hover:bg-white/10 relative font-medium">
             <Link href="/ai-chat">
               <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00E5FF] rounded-r-full" />
