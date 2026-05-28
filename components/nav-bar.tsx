@@ -13,26 +13,26 @@ import { cn } from "@/lib/utils";
 
 export function NavBar() {
 	return (
-		<header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#121212] text-white">
-			<div className="flex items-center gap-2">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#121212] text-white">
+            <div className="flex items-center gap-2">
 				<span className="font-bold text-2xl tracking-tight text-white">Memora</span>
 			</div>
-			
-			<NavigationMenu className="hidden lg:flex">
+            <NavigationMenu className="hidden lg:flex">
 				<NavigationMenuList>
 					{NAVIGATION_LIST.map((item) => (
 						<NavigationMenuItem key={item.href}>
-							<Link href={item.href} legacyBehavior passHref>
-								<NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-400 hover:text-white hover:bg-white/5 focus:bg-white/5 data-[active]:bg-white/5 data-[state=open]:bg-white/5")}>
+							<Link href={item.href}>
+                                {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
+                                }
+                                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-400 hover:text-white hover:bg-white/5 focus:bg-white/5 data-[active]:bg-white/5 data-[state=open]:bg-white/5")}>
 									{item.title}
 								</NavigationMenuLink>
-							</Link>
+                            </Link>
 						</NavigationMenuItem>
 					))}
 				</NavigationMenuList>
 			</NavigationMenu>
-
-			<div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
 				<Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-semibold rounded-md px-6">
 					Resume Session
 				</Button>
@@ -43,6 +43,6 @@ export function NavBar() {
 					<User />
 				</Button>
 			</div>
-		</header>
-	);
+        </header>
+    );
 }
