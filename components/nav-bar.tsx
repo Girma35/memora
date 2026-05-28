@@ -21,13 +21,12 @@ export function NavBar() {
 				<NavigationMenuList>
 					{NAVIGATION_LIST.map((item) => (
 						<NavigationMenuItem key={item.href}>
-							<Link href={item.href}>
-                                {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                                }
-                                <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-400 hover:text-white hover:bg-white/5 focus:bg-white/5 data-[active]:bg-white/5 data-[state=open]:bg-white/5")}>
-									{item.title}
-								</NavigationMenuLink>
-                            </Link>
+							<NavigationMenuLink
+								asChild
+								className={cn(navigationMenuTriggerStyle(), "bg-transparent text-zinc-400 hover:text-white hover:bg-white/5 focus:bg-white/5 data-[active]:bg-white/5 data-[state=open]:bg-white/5")}
+							>
+								<Link href={item.href}>{item.title}</Link>
+							</NavigationMenuLink>
 						</NavigationMenuItem>
 					))}
 				</NavigationMenuList>
