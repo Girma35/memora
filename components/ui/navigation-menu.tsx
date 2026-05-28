@@ -158,8 +158,7 @@ function NavigationMenuIndicator({
 export const NAVIGATION_LIST = [
 	{ title: "Session", href: "/session" },
 	{ title: "AI Chat", href: "/ai-chat" },
-	{ title: "Project Detail", href: "/project-detail" },
-	{ title: "Search & Recall", href: "/search-recall" },
+	{ title: "Workspaces", href: "/workspaces" },
 	{ title: "Settings", href: "/settings" },
 ];
 
