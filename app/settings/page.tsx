@@ -25,6 +25,7 @@ import {
   Plug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AppSidebar } from "@/components/app-sidebar";
 import { NavBar } from "@/components/nav-bar";
 
 type IntegrationStatus = "connected" | "active" | "disconnected";
@@ -295,30 +296,7 @@ export default function SettingsPage() {
       <NavBar />
 
       <div className="flex flex-1 w-full max-w-6xl mx-auto mt-8 px-6 gap-12 pb-16">
-        {/* Sidebar */}
-        <aside className="w-48 shrink-0 flex flex-col gap-1">
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/workspace">
-              <LayoutGrid className="size-4" /> Workspace
-            </Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/session">
-              <History className="size-4" /> Memory
-            </Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/ai-chat">
-              <MessageSquare className="size-4" /> AI Chat
-            </Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-[#00E5FF] bg-white/5 hover:bg-white/10 relative font-medium">
-            <Link href="/settings">
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00E5FF] rounded-r-full" />
-              <Settings className="size-4" /> Settings
-            </Link>
-          </Button>
-        </aside>
+        <AppSidebar />
 
         {/* Main Content */}
         <main className="flex-1">

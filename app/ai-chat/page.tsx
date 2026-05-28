@@ -2,8 +2,6 @@ import Link from "next/link";
 import { 
   Bell, 
   Settings, 
-  LayoutGrid, 
-  History, 
   BarChart2, 
   MessageSquare,
   Paperclip,
@@ -13,9 +11,11 @@ import {
   FileText,
   Clock,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AppSidebar } from "@/components/app-sidebar";
 
 export default function AIChatPage() {
   return (
@@ -44,23 +44,7 @@ export default function AIChatPage() {
       {/* Main Layout */}
       <div className="flex flex-1 w-full max-w-[1400px] mx-auto mt-8 px-6 gap-8 h-[calc(100vh-80px)]">
         
-        {/* Sidebar */}
-        <aside className="w-48 shrink-0 flex flex-col gap-1">
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/workspace"><LayoutGrid className="size-4" /> Workspace</Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-zinc-400 hover:text-white hover:bg-white/5">
-            <Link href="/session">
-              <History className="size-4" /> Memory
-            </Link>
-          </Button>
-          <Button variant="ghost" asChild className="w-full justify-start gap-3 px-4 py-6 rounded-lg text-sm text-[#00E5FF] bg-white/5 hover:bg-white/10 relative font-medium">
-            <Link href="/ai-chat">
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-[#00E5FF] rounded-r-full" />
-              <MessageSquare className="size-4" /> AI Chat
-            </Link>
-          </Button>
-        </aside>
+        <AppSidebar />
 
         {/* Chat Content */}
         <main className="flex-1 flex flex-col relative max-w-3xl border-r border-white/5 pr-8 h-full">
