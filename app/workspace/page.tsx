@@ -1,7 +1,4 @@
-import Link from "next/link";
 import { 
-  Bell, 
-  Settings, 
   Target,
   Pause,
   AlertTriangle,
@@ -15,31 +12,13 @@ import {
   Command
 } from "lucide-react";
 import { AppSidebar } from "@/components/app-sidebar";
+import { NavBar } from "@/components/nav-bar";
 import { Button } from "@/components/ui/button";
 
 export default function WorkspacePage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#111111] text-zinc-300 font-sans">
-      {/* Top Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#121212]">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="font-bold text-2xl tracking-tight text-white hover:opacity-80 transition">
-            Memora
-          </Link>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-semibold rounded-full px-5">
-            Quick Capture
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-zinc-400 hover:text-white">
-            <Bell />
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-full hover:bg-white/10 text-zinc-400 hover:text-white">
-            <Settings />
-          </Button>
-        </div>
-      </header>
+      <NavBar />
 
       {/* Main Layout */}
       <div className="flex flex-1 w-full max-w-6xl mx-auto mt-8 px-6 gap-12">
