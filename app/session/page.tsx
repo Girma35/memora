@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { 
+  Bell,
+  Settings,
   Activity,
   GitMerge,
   Lightbulb,
