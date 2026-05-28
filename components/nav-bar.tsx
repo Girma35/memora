@@ -15,7 +15,9 @@ export function NavBar() {
 	return (
         <header className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#121212] text-white">
             <div className="flex items-center gap-2">
-				<span className="font-bold text-2xl tracking-tight text-white">Memora</span>
+				<Link href="/" className="font-bold text-2xl tracking-tight text-white hover:opacity-80 transition">
+					Memora
+				</Link>
 			</div>
             <NavigationMenu className="hidden lg:flex">
 				<NavigationMenuList>
