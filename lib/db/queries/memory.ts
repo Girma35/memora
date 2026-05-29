@@ -1,10 +1,14 @@
 import { db } from "@/lib/db";
-import { memoryItems, sessions } from "@/lib/db/schema";
-import { eq, desc, and, inArray } from "drizzle-orm";
+import { memoryItems, sessions, type memoryTypeEnum } from "@/lib/db/schema";
+import { eq, desc, and, inArray, sql } from "drizzle-orm";
 
-export async function getMemoriesForUser(userId: number, type?: string) {
+export async function getMemoriesForUser(
+	userId: number,
+	type?: string,
+) {
 	const conditions = [eq(memoryItems.userId, userId)];
-	if (type) conditions.push(eq(memoryItems.type, type));
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	if (type) conditions.push(eq(memoryItems.type, type as any));
 	return db
 		.select({
 			id: memoryItems.id,
@@ -29,7 +33,7 @@ export async function getInsightsForUser(userId: number, limit = 5) {
 		.where(
 			and(
 				eq(memoryItems.userId, userId),
-				inArray(memoryItems.type, ["insight", "pattern"]),
+				inArray(memoryItems.type, ["insight", "pattern"] as const),
 			),
 		)
 		.orderBy(desc(memoryItems.importanceScore))
@@ -37,15 +41,13 @@ export async function getInsightsForUser(userId: number, limit = 5) {
 }
 
 export async function getDailySummary(userId: number) {
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
 	const summaries = await db
 		.select()
 		.from(memoryItems)
 		.where(
 			and(
 				eq(memoryItems.userId, userId),
-				eq(memoryItems.type, "summary"),
+				eq(memoryItems.type, "summary" as const),
 			),
 		)
 		.orderBy(desc(memoryItems.createdAt))
@@ -60,13 +62,9 @@ export async function searchMemories(userId: number, query: string) {
 		.where(
 			and(
 				eq(memoryItems.userId, userId),
-				// Basic text search using ILIKE
-				// In production, replace with pgvector semantic search
 				sql`${memoryItems.content} ILIKE ${`%${query}%`}`,
 			),
 		)
 		.orderBy(desc(memoryItems.importanceScore))
 		.limit(10);
 }
-
-import { sql } from "drizzle-orm";

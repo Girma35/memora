@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { sessions, activities } from "@/lib/db/schema";
-import { eq, desc, and, sql, lte, gte } from "drizzle-orm";
+import { eq, and, sql, lte, gte, type InferSelectModel } from "drizzle-orm";
+
+type Activity = InferSelectModel<typeof activities>;
 
 export interface DailyStats {
 	date: string;
@@ -32,25 +34,14 @@ export async function getDailyAnalytics(userId: number, days = 7): Promise<Daily
 			);
 
 		const sessionIds = daySessions.map((s) => s.id);
-		const dayActivities = sessionIds.length > 0
-			? await db
-					.select()
-					.from(activities)
-					.where(
-						and(
-							eq(activities.sessionId, sessionIds[0]),
-							// Use sessionId IN query via individual queries
-						),
-					)
-			: [];
 
 		// Get all activities for these sessions
-		let allActivities: typeof dayActivities = [];
+		let allActivities: Activity[] = [];
 		for (const sid of sessionIds) {
 			const acts = await db
 				.select()
 				.from(activities)
-				.where(and(eq(activities.sessionId, sid)));
+				.where(eq(activities.sessionId, sid));
 			allActivities = [...allActivities, ...acts];
 		}
 

@@ -1,6 +1,5 @@
 import { getAIClient } from "@/lib/ai/client";
 import { getActivitiesForSession } from "@/lib/db/queries/activities";
-import type { Activity } from "@/lib/db/schema";
 
 type Activity = typeof import("@/lib/db/schema").activities.$inferSelect;
 

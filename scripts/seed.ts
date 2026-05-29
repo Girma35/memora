@@ -7,6 +7,10 @@ import {
 	activities,
 	projects,
 	memoryItems,
+	embeddings,
+	knowledgeEntities,
+	knowledgeRelations,
+	continuationPoints,
 } from "../lib/db/schema";
 
 const connectionString = process.env.DATABASE_URL!;
@@ -16,7 +20,11 @@ const db = drizzle(client);
 async function seed() {
 	console.log("🌱 Seeding database with mock data...\n");
 
-	// Clean existing data
+	// Clean existing data (order matters for FK constraints)
+	await db.delete(continuationPoints);
+	await db.delete(knowledgeRelations);
+	await db.delete(knowledgeEntities);
+	await db.delete(embeddings);
 	await db.delete(memoryItems);
 	await db.delete(activities);
 	await db.delete(sessions);
@@ -310,11 +318,110 @@ async function seed() {
 
 	console.log(`  ✓ Created ${6} memory items`);
 
+	// --- Knowledge Entities ---
+	const [entityAuth] = await db
+		.insert(knowledgeEntities)
+		.values({
+			userId: user.id,
+			type: "project",
+			name: "Authentication System",
+			description: "JWT-based auth with token refresh rotation",
+			metadata: { sessions: 3, files: ["auth.ts", "middleware.ts", "auth.utils.ts"] },
+			strength: 90,
+		})
+		.returning();
+
+	const [entityMiddleware] = await db
+		.insert(knowledgeEntities)
+		.values({
+			userId: user.id,
+			type: "file",
+			name: "middleware.ts",
+			description: "Next.js middleware for auth token handling",
+			metadata: { modifiedIn: [sessionYesterday.id, sessionToday.id] },
+			strength: 80,
+		})
+		.returning();
+
+	const [entityHydration] = await db
+		.insert(knowledgeEntities)
+		.values({
+			userId: user.id,
+			type: "bug",
+			name: "SSR Hydration Bug",
+			description: "Client-side race condition in token state during SSR",
+			metadata: { severity: "high", status: "resolved", sessions: 2 },
+			strength: 85,
+		})
+		.returning();
+
+	// --- Knowledge Relations ---
+	await db.insert(knowledgeRelations).values([
+		{
+			sourceId: entityAuth.id,
+			targetId: entityMiddleware.id,
+			relationType: "contains",
+			strength: 90,
+		},
+		{
+			sourceId: entityHydration.id,
+			targetId: entityMiddleware.id,
+			relationType: "located_in",
+			strength: 95,
+		},
+		{
+			sourceId: entityHydration.id,
+			targetId: entityAuth.id,
+			relationType: "related_to",
+			strength: 75,
+		},
+	]);
+
+	console.log(`  ✓ Created ${3} knowledge entities + ${3} relations`);
+
+	// --- Continuation Points ---
+	await db.insert(continuationPoints).values([
+		{
+			sessionId: sessionYesterday.id,
+			description: "Paused while debugging middleware redirect issue",
+			contextSnapshot: {
+				files: ["middleware.ts", "auth.ts"],
+				blockers: ["Session persistence failing on mobile browser instances"],
+				nextStep: "Verify token refresh logic in production",
+				focusArea: "token refresh handling",
+			},
+		},
+	]);
+
+	console.log(`  ✓ Created 1 continuation point`);
+
+	// --- Embeddings (metadata only, no actual vectors since we use ILIKE fallback) ---
+	await db.insert(embeddings).values([
+		{
+			userId: user.id,
+			entityType: "session",
+			entityId: sessionYesterday.id,
+			content: "Authentication Refactor & Middleware Debugging",
+		},
+		{
+			userId: user.id,
+			entityType: "memory_item",
+			entityId: 1,
+			content: "Fixed sidebar hydration issue — resolved the SSR mismatch in the navigation component",
+		},
+	]);
+
+	console.log(`  ✓ Created 2 embeddings`);
+
 	console.log("\n✅ Seed complete!");
 	console.log(`   User ID: ${user.id}`);
 	console.log(`   Sessions: 3 (1 active, 2 completed)`);
 	console.log(`   Activities: 10`);
 	console.log(`   Memory Items: 6`);
+	console.log(`   Knowledge Entities: 3`);
+	console.log(`   Knowledge Relations: 3`);
+	console.log(`   Continuation Points: 1`);
+	console.log(`   Embeddings: 2`);
 	console.log(`\n📊 Home Feed will now show real data.`);
 
 	await client.end();

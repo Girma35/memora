@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { sessions, activities, memoryItems } from "@/lib/db/schema";
-import { eq, desc, and, sql, lte, gte } from "drizzle-orm";
+import { eq, desc, and, sql, lte, gte, inArray } from "drizzle-orm";
 
 export interface TimelineEvent {
 	type: "session" | "activity" | "memory" | "break";

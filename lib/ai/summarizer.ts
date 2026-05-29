@@ -1,5 +1,4 @@
 import { getAIClient } from "./client";
-import type { Activity } from "@/lib/db/schema";
 
 type Activity = typeof import("@/lib/db/schema").activities.$inferSelect;
 

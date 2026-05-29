@@ -1,7 +1,6 @@
 import { getCurrentSession, getLastCompletedSession } from "@/lib/db/queries/sessions";
 import { getContextItemsForSession } from "@/lib/db/queries/activities";
 import { getInsightsForUser } from "@/lib/db/queries/memory";
-import type { Activity } from "@/lib/db/schema";
 
 type Activity = typeof import("@/lib/db/schema").activities.$inferSelect;
 

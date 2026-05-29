@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { sessions } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export class SessionManager {
 	private userId: number;
@@ -74,8 +74,10 @@ export class SessionManager {
 			.select()
 			.from(sessions)
 			.where(
-				eq(sessions.status, "active") &&
+				and(
+					eq(sessions.status, "active"),
 					eq(sessions.userId, this.userId),
+				),
 			)
 			.orderBy(desc(sessions.startTime))
 			.limit(1);
