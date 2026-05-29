@@ -38,6 +38,30 @@ export const memoryTypeEnum = pgEnum("memory_type", [
 	"decision_log",
 ]);
 
+export const entityTypeEnum = pgEnum("entity_type", [
+	"project",
+	"file",
+	"bug",
+	"feature",
+	"decision",
+	"topic",
+	"person",
+	"meeting",
+]);
+
+export const relationTypeEnum = pgEnum("relation_type", [
+	"contains",
+	"belongs_to",
+	"located_in",
+	"has_bug",
+	"influences",
+	"related_to",
+	"depends_on",
+	"fixes",
+	"discusses",
+	"implemented_in",
+]);
+
 // --- Users ---
 export const users = pgTable("users", {
 	id: serial("id").primaryKey(),
@@ -102,5 +126,57 @@ export const memoryItems = pgTable("memory_items", {
 	content: text("content").notNull(),
 	tags: text("tags").array(),
 	importanceScore: integer("importance_score").default(0),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Embeddings (for semantic search) ---
+export const embeddings = pgTable("embeddings", {
+	id: serial("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	entityType: text("entity_type").notNull(), // "session" | "activity" | "memory_item"
+	entityId: integer("entity_id").notNull(),
+	content: text("content").notNull(),
+	embedding: json("embedding"), // vector stored as JSON array
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Knowledge Entities (nodes in knowledge graph) ---
+export const knowledgeEntities = pgTable("knowledge_entities", {
+	id: serial("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	type: entityTypeEnum("type").notNull(),
+	name: text("name").notNull(),
+	description: text("description"),
+	metadata: json("metadata"),
+	strength: integer("strength").default(50),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Knowledge Relations (edges in knowledge graph) ---
+export const knowledgeRelations = pgTable("knowledge_relations", {
+	id: serial("id").primaryKey(),
+	sourceId: integer("source_id")
+		.notNull()
+		.references(() => knowledgeEntities.id, { onDelete: "cascade" }),
+	targetId: integer("target_id")
+		.notNull()
+		.references(() => knowledgeEntities.id, { onDelete: "cascade" }),
+	relationType: relationTypeEnum("relation_type").notNull(),
+	strength: integer("strength").default(50),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Continuation Points (pause/resume context) ---
+export const continuationPoints = pgTable("continuation_points", {
+	id: serial("id").primaryKey(),
+	sessionId: integer("session_id")
+		.notNull()
+		.references(() => sessions.id, { onDelete: "cascade" }),
+	description: text("description").notNull(),
+	contextSnapshot: json("context_snapshot"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });

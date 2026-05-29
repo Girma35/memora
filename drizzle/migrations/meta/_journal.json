@@ -15,6 +15,13 @@
       "when": 1780089077468,
       "tag": "0001_powerful_garia",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1780090015305,
+      "tag": "0002_lying_whizzer",
+      "breakpoints": true
     }
   ]
 }
