@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { suggestNextStepsAI } from "@/lib/continuation/next-step-suggester";
 import { getCurrentSession, getLastCompletedSession } from "@/lib/db/queries/sessions";
 import { getContextItemsForSession } from "@/lib/db/queries/activities";
+import { requireUserId } from "@/lib/db/get-user";
 
 export async function GET() {
 	try {
-		const userId = 1;
+		const userId = await requireUserId();
 		const activeSession = await getCurrentSession(userId);
 		const session = activeSession ?? (await getLastCompletedSession(userId));
 

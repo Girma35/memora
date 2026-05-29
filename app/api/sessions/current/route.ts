@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessions, activities } from "@/lib/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
+import { requireUserId } from "@/lib/db/get-user";
 
 export async function GET() {
 	try {
-		const userId = 1;
+		const userId = await requireUserId();
 		const [session] = await db
 			.select({
 				id: sessions.id,

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getProductivityStreak, getDailyAnalytics } from "@/lib/db/queries/analytics";
+import { requireUserId } from "@/lib/db/get-user";
 
 export async function GET() {
 	try {
-		const userId = 1;
+		const userId = await requireUserId();
 		const [streak, dailyStats] = await Promise.all([
 			getProductivityStreak(userId),
 			getDailyAnalytics(userId, 7),

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { sessions, activities, memoryItems } from "@/lib/db/schema";
 import { eq, desc, and, sql, inArray } from "drizzle-orm";
+import { requireUserId } from "@/lib/db/get-user";
 
 export async function GET() {
 	try {
-		const userId = 1;
+		const userId = await requireUserId();
 
 		// Get recent sessions
 		const recentSessions = await db

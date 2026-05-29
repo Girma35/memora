@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { semanticSearch } from "@/lib/semantic/search";
+import { requireUserId } from "@/lib/db/get-user";
 
 export async function GET(request: Request) {
 	try {
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
 			);
 		}
 
-		const userId = 1;
+		const userId = await requireUserId();
 		const results = await semanticSearch(userId, query);
 		return NextResponse.json(results);
 	} catch (error) {
