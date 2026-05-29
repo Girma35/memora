@@ -8,6 +8,13 @@
       "when": 1780052678707,
       "tag": "0000_broad_scarlet_spider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780089077468,
+      "tag": "0001_powerful_garia",
+      "breakpoints": true
     }
   ]
 }
