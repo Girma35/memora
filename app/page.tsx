@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { NavBar } from "@/components/nav-bar";
 import {
 	Lightbulb,
@@ -77,6 +78,7 @@ export default function Home() {
 	const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
 	const [memories, setMemories] = useState<MemoryData[]>([]);
 	const [loading, setLoading] = useState(true);
+	const router = useRouter();
 
 	useEffect(() => {
 		async function fetchData() {
@@ -165,7 +167,7 @@ export default function Home() {
 										<p className="text-white text-sm">{ctx.nextSteps[0]}</p>
 									</div>
 								</div>
-								<Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black px-5 font-semibold">
+								<Button onClick={() => router.push("/workspace")} className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black px-5 font-semibold">
 									Quick continue
 								</Button>
 							</div>
@@ -179,7 +181,7 @@ export default function Home() {
 								<p className="text-[11px] font-bold text-[#00E5FF] tracking-widest uppercase">
 									Active Session
 								</p>
-								<Button variant="ghost" size="icon" className="size-8 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10">
+								<Button onClick={() => router.push("/workspace")} variant="ghost" size="icon" className="size-8 bg-white/5 text-zinc-400 hover:text-white hover:bg-white/10">
 									<ExternalLink className="size-4" />
 								</Button>
 							</div>
@@ -205,7 +207,7 @@ export default function Home() {
 								</div>
 							)}
 
-							<Button variant="outline" className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white h-12">
+							<Button onClick={() => router.push("/workspace")} variant="outline" className="w-full bg-white/5 hover:bg-white/10 border-white/10 text-white h-12">
 								<Play className="size-4" /> Quick Continue
 							</Button>
 						</div>
