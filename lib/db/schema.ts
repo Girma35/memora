@@ -6,6 +6,7 @@ import {
 	integer,
 	json,
 	pgEnum,
+	boolean,
 } from "drizzle-orm/pg-core";
 
 // --- Enums ---
@@ -28,6 +29,9 @@ export const activityTypeEnum = pgEnum("activity_type", [
 	"note",
 	"pause_point",
 	"milestone",
+	"ide_focus",
+	"task_abandoned",
+	"meeting",
 ]);
 
 export const memoryTypeEnum = pgEnum("memory_type", [
@@ -36,6 +40,9 @@ export const memoryTypeEnum = pgEnum("memory_type", [
 	"pattern",
 	"milestone",
 	"decision_log",
+	"distraction",
+	"burnout_pattern",
+	"workflow_inefficiency",
 ]);
 
 export const entityTypeEnum = pgEnum("entity_type", [
@@ -61,6 +68,10 @@ export const relationTypeEnum = pgEnum("relation_type", [
 	"discusses",
 	"implemented_in",
 ]);
+
+export const reviewTypeEnum = pgEnum("review_type", ["daily", "weekly"]);
+export const notificationTypeEnum = pgEnum("notification_type", ["reminder", "insight", "warning"]);
+export const chatRoleEnum = pgEnum("chat_role", ["user", "assistant", "system"]);
 
 // --- Users ---
 export const users = pgTable("users", {
@@ -178,5 +189,56 @@ export const continuationPoints = pgTable("continuation_points", {
 		.references(() => sessions.id, { onDelete: "cascade" }),
 	description: text("description").notNull(),
 	contextSnapshot: json("context_snapshot"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- AI Chat ---
+export const chatSessions = pgTable("chat_sessions", {
+	id: serial("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	projectId: integer("project_id").references(() => projects.id, {
+		onDelete: "set null",
+	}),
+	title: text("title").notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const chatMessages = pgTable("chat_messages", {
+	id: serial("id").primaryKey(),
+	chatSessionId: integer("chat_session_id")
+		.notNull()
+		.references(() => chatSessions.id, { onDelete: "cascade" }),
+	role: chatRoleEnum("role").notNull(),
+	content: text("content").notNull(),
+	contextUsed: json("context_used"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Reviews ---
+export const reviews = pgTable("reviews", {
+	id: serial("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	type: reviewTypeEnum("type").notNull(),
+	periodStart: timestamp("period_start").notNull(),
+	periodEnd: timestamp("period_end").notNull(),
+	summaryContent: text("summary_content").notNull(),
+	metrics: json("metrics"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// --- Smart Notifications ---
+export const smartNotifications = pgTable("smart_notifications", {
+	id: serial("id").primaryKey(),
+	userId: integer("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	type: notificationTypeEnum("type").notNull(),
+	content: text("content").notNull(),
+	isRead: boolean("is_read").default(false).notNull(),
+	relatedEntityId: integer("related_entity_id"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
