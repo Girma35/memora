@@ -1,0 +1,1 @@
+ALTER TABLE "memory_items" ADD COLUMN "embedding" vector(1536);

@@ -7,6 +7,7 @@ import {
 	json,
 	pgEnum,
 	boolean,
+	vector,
 } from "drizzle-orm/pg-core";
 
 // --- Enums ---
@@ -137,6 +138,7 @@ export const memoryItems = pgTable("memory_items", {
 	content: text("content").notNull(),
 	tags: text("tags").array(),
 	importanceScore: integer("importance_score").default(0),
+	embedding: vector("embedding", { dimensions: 1536 }),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
