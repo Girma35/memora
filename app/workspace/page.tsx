@@ -75,10 +75,8 @@ export default function WorkspacePage() {
 		// silently using sendBeacon so no data is lost.
 		const handlePageHide = (e: PageTransitionEvent) => {
 			if (!e.persisted) {
-				navigator.sendBeacon("/api/sessions/current", JSON.stringify({
-					action: "pause",
-					summary: "Auto-paused: tab was closed"
-				}));
+				const payload = JSON.stringify({ action: "pause", summary: "Auto-paused: tab was closed" });
+				navigator.sendBeacon("/api/sessions/current", new Blob([payload], { type: "application/json" }));
 			}
 		};
 
