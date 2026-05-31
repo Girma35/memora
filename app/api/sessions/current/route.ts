@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { sessions, activities } from "@/lib/db/schema";
 import { eq, and, desc, sql } from "drizzle-orm";
 import { requireUserId } from "@/lib/db/get-user";
+import { processNewMemory } from "@/lib/memory/ingest";
 
 export async function GET() {
 	try {
@@ -74,6 +75,8 @@ export async function POST(request: Request) {
 				type: "pause_point",
 				description: summary,
 			});
+			// Fire-and-forget memory deduplication/ingestion
+			processNewMemory(userId, summary, "summary", activeSession.id).catch(console.error);
 		}
 
 		return new Response(null, { status: 204 });
@@ -130,6 +133,8 @@ export async function PATCH(request: Request) {
 				type: "pause_point",
 				description: summary,
 			});
+			// Fire-and-forget memory deduplication/ingestion
+			processNewMemory(userId, summary, "summary", activeSession.id).catch(console.error);
 		}
 
 		return NextResponse.json(updatedSession);
