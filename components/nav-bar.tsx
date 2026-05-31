@@ -40,8 +40,8 @@ export function NavBar() {
 				</NavigationMenuList>
 			</NavigationMenu>
 			<div className="flex items-center gap-4">
-				<Button className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-semibold rounded-md px-6">
-					Resume Session
+				<Button asChild className="bg-[#00E5FF] hover:bg-[#00E5FF]/90 text-black font-semibold rounded-md px-6">
+					<Link href="/workspace">Resume Session</Link>
 				</Button>
 				<Button
 					variant="ghost"
