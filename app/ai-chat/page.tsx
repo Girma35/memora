@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
 	MessageSquare,
 	Paperclip,
@@ -38,7 +39,7 @@ interface ChatMessage {
 	memories?: MemoryResult[];
 }
 
-export default function AIChatPage() {
+function AIChatContent() {
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{
 			role: "assistant",
@@ -54,6 +55,18 @@ export default function AIChatPage() {
 		Array<{ id: number; type: string; content: string; sessionTitle: string | null }>
 	>([]);
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+	const searchParams = useSearchParams();
+	const initialQuery = searchParams.get("q");
+
+	// To ensure we only run the initial query once
+	const hasRunInitialQuery = useRef(false);
+
+	useEffect(() => {
+		if (initialQuery && !hasRunInitialQuery.current) {
+			hasRunInitialQuery.current = true;
+			handleSearch(initialQuery);
+		}
+	}, [initialQuery]);
 
 	useEffect(() => {
 		fetch("/api/memory")
@@ -254,5 +267,13 @@ export default function AIChatPage() {
 				</aside>
 			</div>
 		</div>
+	);
+}
+
+export default function AIChatPage() {
+	return (
+		<Suspense fallback={<div className="flex min-h-screen bg-[#111111] items-center justify-center"><Loader2 className="size-6 text-[#00E5FF] animate-spin" /></div>}>
+			<AIChatContent />
+		</Suspense>
 	);
 }

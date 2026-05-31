@@ -78,7 +78,14 @@ export default function Home() {
 	const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
 	const [memories, setMemories] = useState<MemoryData[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [chatInput, setChatInput] = useState("");
 	const router = useRouter();
+
+	const handleChatSubmit = () => {
+		if (chatInput.trim()) {
+			router.push(`/ai-chat?q=${encodeURIComponent(chatInput.trim())}`);
+		}
+	};
 
 	useEffect(() => {
 		async function fetchData() {
@@ -240,12 +247,20 @@ export default function Home() {
 							</div>
 							<input
 								type="text"
+								value={chatInput}
+								onChange={(e) => setChatInput(e.target.value)}
+								onKeyDown={(e) => {
+									if (e.key === "Enter") handleChatSubmit();
+								}}
 								placeholder="Ask Memora OS anything..."
 								className="bg-transparent border-none outline-none text-sm text-white flex-1 placeholder:text-zinc-600"
 							/>
 							<div className="flex items-center gap-2">
 								<div className="size-7 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 text-xs font-mono">⌘K</div>
-								<div className="size-7 rounded-full bg-[#00E5FF] flex items-center justify-center text-black cursor-pointer hover:bg-[#00E5FF]/90 transition">
+								<div 
+									onClick={handleChatSubmit}
+									className="size-7 rounded-full bg-[#00E5FF] flex items-center justify-center text-black cursor-pointer hover:bg-[#00E5FF]/90 transition"
+								>
 									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
 										<line x1="22" y1="2" x2="11" y2="13"></line>
 										<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
