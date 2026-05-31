@@ -59,24 +59,34 @@ export default function WorkspacePage() {
 		fetchContext();
 	}, []);
 
-	// Intercept tab close to ask for context
+	// Intercept tab close/switch to show pause modal when user returns
 	useEffect(() => {
 		if (!ctx?.hasActiveSession) return;
 
+		// beforeunload: shows browser's native "Leave site?" dialog on refresh/navigate
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-			// Trigger browser's default warning prompt
 			e.preventDefault();
-			e.returnValue = "";
+			e.returnValue = "You have an active session running!";
+		};
 
-			// If the user clicks "Cancel" to stay on the page, the JavaScript thread resumes.
-			// We use a short timeout to catch that resumption and show our custom modal.
-			setTimeout(() => {
+		// visibilitychange: fires reliably in ALL browsers when:
+		// - user clicks the X button and the tab becomes hidden
+		// - user switches to another tab
+		// - user minimizes the window
+		// When they come back (visible), show our pause modal.
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === "visible") {
 				setShowPauseModal(true);
-			}, 100);
+			}
 		};
 
 		window.addEventListener("beforeunload", handleBeforeUnload);
-		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+		document.addEventListener("visibilitychange", handleVisibilityChange);
+
+		return () => {
+			window.removeEventListener("beforeunload", handleBeforeUnload);
+			document.removeEventListener("visibilitychange", handleVisibilityChange);
+		};
 	}, [ctx?.hasActiveSession]);
 
 	const startSession = async () => {
