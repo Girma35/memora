@@ -34,7 +34,7 @@ interface ContinuationData {
 
 export default function WorkspacePage() {
 	const [ctx, setCtx] = useState<ContinuationData | null>(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(true); // only true on initial page load
 	
 	// Start Session State
 	const [isStarting, setIsStarting] = useState(false);
@@ -46,8 +46,9 @@ export default function WorkspacePage() {
 	const [pauseSummary, setPauseSummary] = useState("");
 	const [isPausing, setIsPausing] = useState(false);
 
-	const fetchContext = () => {
-		setLoading(true);
+	// Initial load — shows spinner
+	const fetchContext = (silent = false) => {
+		if (!silent) setLoading(true);
 		fetch("/api/continuation")
 			.then((res) => res.ok ? res.json() : null)
 			.then((data) => setCtx(data))
@@ -56,7 +57,7 @@ export default function WorkspacePage() {
 	};
 
 	useEffect(() => {
-		fetchContext();
+		fetchContext(); // first load shows spinner
 	}, []);
 
 	// Show pause modal when user tries to close or refresh the tab
