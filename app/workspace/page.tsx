@@ -102,7 +102,7 @@ export default function WorkspacePage() {
 			if (res.ok) {
 				setNewTitle("");
 				setNewProject("");
-				fetchContext();
+				fetchContext(true); // silent refresh — no spinner flash
 			}
 		} finally {
 			setIsStarting(false);
@@ -120,7 +120,7 @@ export default function WorkspacePage() {
 			if (res.ok) {
 				setShowPauseModal(false);
 				setPauseSummary("");
-				fetchContext();
+				fetchContext(true); // silent refresh — no spinner flash
 			}
 		} catch(e) {
 		} finally {
