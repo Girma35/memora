@@ -35,9 +35,16 @@ interface ContinuationData {
 export default function WorkspacePage() {
 	const [ctx, setCtx] = useState<ContinuationData | null>(null);
 	const [loading, setLoading] = useState(true);
+	
+	// Start Session State
 	const [isStarting, setIsStarting] = useState(false);
 	const [newTitle, setNewTitle] = useState("");
 	const [newProject, setNewProject] = useState("");
+
+	// Pause Session Modal State
+	const [showPauseModal, setShowPauseModal] = useState(false);
+	const [pauseSummary, setPauseSummary] = useState("");
+	const [isPausing, setIsPausing] = useState(false);
 
 	const fetchContext = () => {
 		setLoading(true);
@@ -71,17 +78,23 @@ export default function WorkspacePage() {
 		}
 	};
 
-	const pauseSession = async () => {
+	const submitPauseSession = async () => {
+		setIsPausing(true);
 		try {
 			const res = await fetch("/api/sessions/current", {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ action: "pause" })
+				body: JSON.stringify({ action: "pause", summary: pauseSummary })
 			});
 			if (res.ok) {
+				setShowPauseModal(false);
+				setPauseSummary("");
 				fetchContext();
 			}
-		} catch(e) {}
+		} catch(e) {
+		} finally {
+			setIsPausing(false);
+		}
 	};
 
 	const files = ctx?.filesTouched ?? [];
@@ -91,19 +104,19 @@ export default function WorkspacePage() {
 	const displayTime = `${Math.floor(minutes / 60).toString().padStart(2, "0")}:${(minutes % 60).toString().padStart(2, "0")}`;
 
 	return (
-		<div className="flex flex-col min-h-screen bg-[#111111] text-zinc-300 font-sans">
+		<div className="flex flex-col min-h-screen bg-[#111111] text-zinc-300 font-sans relative">
 			<NavBar />
 
 			<div className="flex flex-1 w-full max-w-6xl mx-auto mt-8 px-6 gap-12">
 				<AppSidebar />
 
-				<main className="flex-1 pb-24">
+				<main className="flex-1 pb-24 relative">
 					<div className="flex items-center justify-between mb-8">
 						<div className="flex items-center gap-3 text-[#00E5FF] font-bold tracking-widest text-xs uppercase">
 							<Target className="size-5" />{ctx?.hasActiveSession ? "ACTIVE SESSION" : "WORKSPACE"}
 						</div>
 						{ctx?.hasActiveSession && (
-							<Button onClick={pauseSession} variant="outline" className="rounded-full border-white/10 bg-transparent hover:bg-white/5 text-zinc-300 px-5">
+							<Button onClick={() => setShowPauseModal(true)} variant="outline" className="rounded-full border-white/10 bg-transparent hover:bg-white/5 text-zinc-300 px-5">
 								<Pause className="size-4 mr-2" /> Pause Session
 							</Button>
 						)}
@@ -233,6 +246,33 @@ export default function WorkspacePage() {
 					)}
 				</main>
 			</div>
+
+			{/* PAUSE MODAL OVERLAY */}
+			{showPauseModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+					<div className="bg-[#141414] border border-white/10 p-8 rounded-2xl w-full max-w-md shadow-2xl relative">
+						<h2 className="text-xl font-bold text-white mb-2">Pause Session</h2>
+						<p className="text-sm text-zinc-400 mb-6">What were you just working on? Log this context so you can resume easily later.</p>
+						
+						<textarea
+							autoFocus
+							className="w-full bg-[#1A1A1A] border border-white/10 rounded-lg p-3 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-[#00E5FF]/50 transition-colors resize-none mb-6 h-32"
+							placeholder="e.g. Fixed the hydration bug, next step is the auth middleware..."
+							value={pauseSummary}
+							onChange={(e) => setPauseSummary(e.target.value)}
+						/>
+						
+						<div className="flex justify-end gap-3">
+							<Button variant="ghost" onClick={() => setShowPauseModal(false)} className="text-zinc-400 hover:text-white">
+								Cancel
+							</Button>
+							<Button onClick={submitPauseSession} disabled={!pauseSummary || isPausing} className="bg-[#00E5FF] text-black hover:bg-[#00E5FF]/90 font-semibold">
+								{isPausing ? <Loader2 className="size-4 animate-spin" /> : "Save & Pause"}
+							</Button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
