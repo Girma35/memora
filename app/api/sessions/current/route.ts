@@ -67,7 +67,7 @@ export async function PATCH(request: Request) {
 		}
 
 		const body = await request.json();
-		const { action } = body; // "pause" or "complete"
+		const { action, summary } = body; // "pause" or "complete"
 
 		const status = action === "complete" ? "completed" : "paused";
 		const endTime = new Date();
@@ -84,6 +84,14 @@ export async function PATCH(request: Request) {
 			})
 			.where(eq(sessions.id, activeSession.id))
 			.returning();
+
+		if (summary) {
+			await db.insert(activities).values({
+				sessionId: activeSession.id,
+				type: "pause_point",
+				description: summary,
+			});
+		}
 
 		return NextResponse.json(updatedSession);
 	} catch (error) {
