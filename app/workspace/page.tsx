@@ -59,33 +59,35 @@ export default function WorkspacePage() {
 		fetchContext();
 	}, []);
 
-	// Intercept tab close/switch to show pause modal when user returns
+	// Show pause modal when user tries to close or refresh the tab
 	useEffect(() => {
 		if (!ctx?.hasActiveSession) return;
 
-		// beforeunload: shows browser's native "Leave site?" dialog on refresh/navigate
+		// beforeunload: blocks navigation/refresh with native Chrome dialog
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
 			e.preventDefault();
 			e.returnValue = "You have an active session running!";
 		};
 
-		// visibilitychange: fires reliably in ALL browsers when:
-		// - user clicks the X button and the tab becomes hidden
-		// - user switches to another tab
-		// - user minimizes the window
-		// When they come back (visible), show our pause modal.
-		const handleVisibilityChange = () => {
-			if (document.visibilityState === "visible") {
-				setShowPauseModal(true);
+		// pagehide fires when the tab is actually being closed/navigated.
+		// If e.persisted is false, the page is truly being unloaded.
+		// We can't show a modal at this point, but we can auto-pause the session
+		// silently using sendBeacon so no data is lost.
+		const handlePageHide = (e: PageTransitionEvent) => {
+			if (!e.persisted) {
+				navigator.sendBeacon("/api/sessions/current", JSON.stringify({
+					action: "pause",
+					summary: "Auto-paused: tab was closed"
+				}));
 			}
 		};
 
 		window.addEventListener("beforeunload", handleBeforeUnload);
-		document.addEventListener("visibilitychange", handleVisibilityChange);
+		window.addEventListener("pagehide", handlePageHide);
 
 		return () => {
 			window.removeEventListener("beforeunload", handleBeforeUnload);
-			document.removeEventListener("visibilitychange", handleVisibilityChange);
+			window.removeEventListener("pagehide", handlePageHide);
 		};
 	}, [ctx?.hasActiveSession]);
 

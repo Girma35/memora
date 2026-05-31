@@ -43,6 +43,45 @@ export async function GET() {
 	}
 }
 
+// Used by sendBeacon on tab close (sendBeacon only supports POST)
+export async function POST(request: Request) {
+	try {
+		const userId = await requireUserId();
+		const body = await request.json();
+		const { action, summary } = body;
+
+		const [activeSession] = await db
+			.select()
+			.from(sessions)
+			.where(and(eq(sessions.userId, userId), eq(sessions.status, "active")))
+			.limit(1);
+
+		if (!activeSession) return new Response(null, { status: 204 });
+
+		const status = action === "complete" ? "completed" : "paused";
+		const endTime = new Date();
+		const durationMinutes = Math.floor(
+			(endTime.getTime() - new Date(activeSession.startTime).getTime()) / 60000,
+		);
+
+		await db.update(sessions)
+			.set({ status, endTime, durationMinutes })
+			.where(eq(sessions.id, activeSession.id));
+
+		if (summary) {
+			await db.insert(activities).values({
+				sessionId: activeSession.id,
+				type: "pause_point",
+				description: summary,
+			});
+		}
+
+		return new Response(null, { status: 204 });
+	} catch {
+		return new Response(null, { status: 500 });
+	}
+}
+
 export async function PATCH(request: Request) {
 	try {
 		const userId = await requireUserId();
