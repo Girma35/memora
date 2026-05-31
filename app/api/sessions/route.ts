@@ -36,3 +36,36 @@ export async function GET() {
 		);
 	}
 }
+
+export async function POST(request: Request) {
+	try {
+		const userId = await requireUserId();
+		const body = await request.json();
+		const { title, project } = body;
+
+		if (!title) {
+			return NextResponse.json(
+				{ error: "Title is required" },
+				{ status: 400 },
+			);
+		}
+
+		const [newSession] = await db
+			.insert(sessions)
+			.values({
+				userId,
+				title,
+				project: project || null,
+				status: "active",
+			})
+			.returning();
+
+		return NextResponse.json(newSession, { status: 201 });
+	} catch (error) {
+		console.error("Failed to create session:", error);
+		return NextResponse.json(
+			{ error: "Failed to create session" },
+			{ status: 500 },
+		);
+	}
+}

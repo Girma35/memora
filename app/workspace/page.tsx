@@ -35,22 +35,59 @@ interface ContinuationData {
 export default function WorkspacePage() {
 	const [ctx, setCtx] = useState<ContinuationData | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [isStarting, setIsStarting] = useState(false);
+	const [newTitle, setNewTitle] = useState("");
+	const [newProject, setNewProject] = useState("");
 
-	useEffect(() => {
+	const fetchContext = () => {
+		setLoading(true);
 		fetch("/api/continuation")
 			.then((res) => res.ok ? res.json() : null)
 			.then((data) => setCtx(data))
 			.catch(() => {})
 			.finally(() => setLoading(false));
+	};
+
+	useEffect(() => {
+		fetchContext();
 	}, []);
 
-	const files = ctx?.filesTouched ?? ["auth.ts", "middleware.ts", "session_provider.tsx"];
+	const startSession = async () => {
+		if (!newTitle) return;
+		setIsStarting(true);
+		try {
+			const res = await fetch("/api/sessions", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ title: newTitle, project: newProject })
+			});
+			if (res.ok) {
+				setNewTitle("");
+				setNewProject("");
+				fetchContext();
+			}
+		} finally {
+			setIsStarting(false);
+		}
+	};
+
+	const pauseSession = async () => {
+		try {
+			const res = await fetch("/api/sessions/current", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ action: "pause" })
+			});
+			if (res.ok) {
+				fetchContext();
+			}
+		} catch(e) {}
+	};
+
+	const files = ctx?.filesTouched ?? [];
 	const blockers = ctx?.blockers ?? [];
-	const steps = ctx?.nextSteps ?? [
-		"Verify token refresh logic in production",
-		"Test cookie expiration on localhost:3000",
-	];
-	const minutes = ctx?.elapsedMinutes ?? 52;
+	const steps = ctx?.nextSteps ?? [];
+	const minutes = ctx?.elapsedMinutes ?? 0;
 	const displayTime = `${Math.floor(minutes / 60).toString().padStart(2, "0")}:${(minutes % 60).toString().padStart(2, "0")}`;
 
 	return (
@@ -65,16 +102,18 @@ export default function WorkspacePage() {
 						<div className="flex items-center gap-3 text-[#00E5FF] font-bold tracking-widest text-xs uppercase">
 							<Target className="size-5" />{ctx?.hasActiveSession ? "ACTIVE SESSION" : "WORKSPACE"}
 						</div>
-						<Button variant="outline" className="rounded-full border-white/10 bg-transparent hover:bg-white/5 text-zinc-300 px-5">
-							<Pause className="size-4 mr-2" /> Pause Session
-						</Button>
+						{ctx?.hasActiveSession && (
+							<Button onClick={pauseSession} variant="outline" className="rounded-full border-white/10 bg-transparent hover:bg-white/5 text-zinc-300 px-5">
+								<Pause className="size-4 mr-2" /> Pause Session
+							</Button>
+						)}
 					</div>
 
 					{loading ? (
 						<div className="flex items-center justify-center py-32">
 							<Loader2 className="size-6 text-[#00E5FF] animate-spin" />
 						</div>
-					) : (
+					) : ctx?.hasActiveSession ? (
 						<>
 						<div className="rounded-2xl border border-white/5 bg-[#141414] p-12 flex flex-col items-center justify-center mb-6 relative overflow-hidden">
 							<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#00E5FF]/5 rounded-full blur-3xl pointer-events-none" />
@@ -82,12 +121,12 @@ export default function WorkspacePage() {
 							<div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 mb-8 z-10">
 								<div className="size-2 rounded-full bg-[#00E5FF]" />
 								<span className="text-xs text-zinc-400 font-medium tracking-wide">
-									{ctx?.project ?? "Memora"} • {ctx?.sessionTitle ?? "focus"}
+									{ctx.project ?? "Memora"} • {ctx.sessionTitle ?? "focus"}
 								</span>
 							</div>
 
 							<h1 className="text-4xl font-bold text-white mb-6 z-10 tracking-tight">
-								{ctx?.sessionTitle ?? "Focus Workspace"}
+								{ctx.sessionTitle}
 							</h1>
 
 							<div className="text-[120px] font-bold text-white leading-none tracking-tighter mb-4 z-10" style={{ fontVariantNumeric: "tabular-nums" }}>
@@ -114,11 +153,11 @@ export default function WorkspacePage() {
 									<Clock className="size-4" /> MEMORY CONTEXT
 								</div>
 								<div className="flex flex-wrap gap-2">
-									{files.slice(0, 6).map((file) => (
+									{files.length > 0 ? files.slice(0, 6).map((file) => (
 										<Button key={file} variant="outline" size="sm" className="bg-[#1A1A1A] border-white/5 hover:bg-white/10 hover:border-white/10 text-zinc-300 text-xs font-normal h-8">
 											<Code2 className="size-3.5 mr-2 text-[#00E5FF]" /> {file}
 										</Button>
-									))}
+									)) : <span className="text-sm text-zinc-500">No recent files</span>}
 								</div>
 							</div>
 						</div>
@@ -129,12 +168,12 @@ export default function WorkspacePage() {
 								<Bot className="size-4 text-[#00E5FF]" /> AI SUGGESTED NEXT STEPS
 							</div>
 							<div className="flex flex-col gap-3 mb-4">
-								{steps.map((step, i) => (
+								{steps.length > 0 ? steps.map((step, i) => (
 									<div key={i} className="flex items-center gap-4 bg-[#1A1A1A] border border-white/5 rounded-xl p-4 cursor-pointer hover:border-white/10 transition-colors">
 										<Circle className="size-5 text-zinc-500" />
 										<span className="text-zinc-300 text-sm">{step}</span>
 									</div>
-								))}
+								)) : <span className="text-sm text-zinc-500">No suggestions yet. Keep working to build context!</span>}
 							</div>
 
 							{/* Floating Command Bar */}
@@ -155,6 +194,42 @@ export default function WorkspacePage() {
 							</div>
 						</div>
 						</>
+					) : (
+						<div className="rounded-2xl border border-white/5 bg-[#141414] p-12 flex flex-col items-center justify-center mb-6 mt-12">
+							<Target className="size-12 text-[#00E5FF] mb-6 opacity-80" />
+							<h2 className="text-2xl font-semibold text-white mb-2">Ready to Focus?</h2>
+							<p className="text-zinc-400 text-center mb-8 max-w-md">
+								Start a new session to begin tracking your workflow, generating context, and building memory.
+							</p>
+							
+							<div className="flex flex-col gap-4 w-full max-w-sm">
+								<input 
+									type="text" 
+									placeholder="What are you working on? (e.g. Auth Bug)" 
+									className="bg-[#1A1A1A] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-[#00E5FF]/50 transition-colors"
+									value={newTitle}
+									onChange={(e) => setNewTitle(e.target.value)}
+								/>
+								<input 
+									type="text" 
+									placeholder="Project (Optional)" 
+									className="bg-[#1A1A1A] border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-[#00E5FF]/50 transition-colors"
+									value={newProject}
+									onChange={(e) => setNewProject(e.target.value)}
+								/>
+								<Button 
+									onClick={startSession} 
+									disabled={!newTitle || isStarting}
+									className="mt-2 bg-[#00E5FF] text-black hover:bg-[#00E5FF]/90 font-semibold py-6 rounded-lg"
+								>
+									{isStarting ? <Loader2 className="size-5 animate-spin" /> : (
+										<>
+											<Play className="size-4 mr-2" /> Start Tracking
+										</>
+									)}
+								</Button>
+							</div>
+						</div>
 					)}
 				</main>
 			</div>

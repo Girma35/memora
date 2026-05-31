@@ -42,3 +42,55 @@ export async function GET() {
 		);
 	}
 }
+
+export async function PATCH(request: Request) {
+	try {
+		const userId = await requireUserId();
+		
+		// Find current active session
+		const [activeSession] = await db
+			.select()
+			.from(sessions)
+			.where(
+				and(
+					eq(sessions.userId, userId),
+					eq(sessions.status, "active"),
+				),
+			)
+			.limit(1);
+
+		if (!activeSession) {
+			return NextResponse.json(
+				{ error: "No active session found" },
+				{ status: 404 },
+			);
+		}
+
+		const body = await request.json();
+		const { action } = body; // "pause" or "complete"
+
+		const status = action === "complete" ? "completed" : "paused";
+		const endTime = new Date();
+		const durationMinutes = Math.floor(
+			(endTime.getTime() - new Date(activeSession.startTime).getTime()) / 60000,
+		);
+
+		const [updatedSession] = await db
+			.update(sessions)
+			.set({
+				status,
+				endTime,
+				durationMinutes,
+			})
+			.where(eq(sessions.id, activeSession.id))
+			.returning();
+
+		return NextResponse.json(updatedSession);
+	} catch (error) {
+		console.error("Failed to update session:", error);
+		return NextResponse.json(
+			{ error: "Failed to update session" },
+			{ status: 500 },
+		);
+	}
+}
