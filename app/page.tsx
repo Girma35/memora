@@ -9,7 +9,7 @@ import {
 	AlertCircle,
 	Play,
 	CheckCircle,
-	Cloud,
+
 	Terminal,
 	AlignLeft,
 	Link as LinkIcon,
@@ -228,26 +228,7 @@ export default function Home() {
 								</div>
 							))
 						) : (
-							<>
-							<div className="flex gap-4 mb-6">
-								<div className="size-10 rounded-full bg-teal-900/40 flex items-center justify-center shrink-0 border border-teal-500/20">
-									<CheckCircle className="size-5 text-[#00E5FF]" />
-								</div>
-								<div>
-									<h3 className="text-sm font-medium text-white mb-1">Hydration issue fixed</h3>
-									<p className="text-xs text-zinc-500">Resolved the SSR mismatch in the navigation component.</p>
-								</div>
-							</div>
-							<div className="flex gap-4 mb-2">
-								<div className="size-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5">
-									<Cloud className="size-5 text-[#00E5FF]" />
-								</div>
-								<div>
-									<h3 className="text-sm font-medium text-white mb-1">Background synchronization</h3>
-									<p className="text-xs text-zinc-500">Staging branch deployed to testing environment.</p>
-								</div>
-							</div>
-							</>
+							<p className="text-xs text-zinc-500">No summaries yet. Complete a session to generate your first AI summary.</p>
 						)}
 
 						{/* Command Bar Overlay */}
@@ -277,12 +258,16 @@ export default function Home() {
 						<div className="rounded-xl border border-white/5 bg-[#141414] p-6 flex flex-col">
 							<p className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase mb-4">Context Stack</p>
 							<div className="flex flex-col gap-2 mb-6">
-								{(ctx?.filesTouched ?? ["auth.ts", "middleware.ts", "session_provider.tsx"]).slice(0, 3).map((file) => (
-									<div key={file} className="bg-[#1C1C1C] border border-white/5 rounded-md px-4 py-2.5 flex items-center gap-3">
-										<AlignLeft className="size-4 text-zinc-500" />
-										<span className="text-sm text-zinc-300">{file}</span>
-									</div>
-								))}
+								{(ctx?.filesTouched ?? []).length > 0 ? (
+									(ctx?.filesTouched ?? []).slice(0, 3).map((file) => (
+										<div key={file} className="bg-[#1C1C1C] border border-white/5 rounded-md px-4 py-2.5 flex items-center gap-3">
+											<AlignLeft className="size-4 text-zinc-500" />
+											<span className="text-sm text-zinc-300">{file}</span>
+										</div>
+									))
+								) : (
+									<p className="text-xs text-zinc-500">No files tracked yet.</p>
+								)}
 							</div>
 							<div className="mt-auto bg-[#1C1C1C] border border-white/5 rounded-md p-4 flex flex-col gap-1">
 								<div className="flex items-center gap-2 text-xs text-white">
@@ -303,7 +288,7 @@ export default function Home() {
 								))
 							) : (
 								<div className="bg-[#1A2326] border border-[#00E5FF]/10 rounded-md p-4 mb-6">
-									<p className="text-sm text-[#00E5FF] font-medium">Memory recall high on related files today.</p>
+									<p className="text-sm text-zinc-500">No insights yet. Work more to generate AI patterns.</p>
 								</div>
 							)}
 							<div className="bg-[#1C1C1C] border border-white/5 rounded-md p-4 mb-6">
@@ -336,23 +321,10 @@ export default function Home() {
 										<p className="text-sm text-white">{session.title}</p>
 									</div>
 								) : (
-									<>
-									<div className="relative pl-6">
-										<div className="absolute left-0 top-1.5 size-2 rounded-full bg-[#00E5FF]" />
-										<p className="text-[10px] text-zinc-500 mb-0.5">09:30 AM</p>
-										<p className="text-sm text-white">Brainstorming Session</p>
-									</div>
 									<div className="relative pl-6">
 										<div className="absolute left-0 top-1.5 size-2 rounded-full bg-zinc-600" />
-										<p className="text-[10px] text-zinc-500 mb-0.5">11:00 AM</p>
-										<p className="text-sm text-zinc-400">Code Review: PR #42</p>
+										<p className="text-xs text-zinc-500">No sessions recorded yet.</p>
 									</div>
-									<div className="relative pl-6">
-										<div className="absolute left-0 top-1.5 size-2 rounded-full bg-zinc-600" />
-										<p className="text-[10px] text-zinc-500 mb-0.5">02:30 PM</p>
-										<p className="text-sm text-zinc-400">Deep Work Session</p>
-									</div>
-									</>
 								)}
 							</div>
 						</div>
@@ -362,7 +334,7 @@ export default function Home() {
 							<div className="flex justify-between items-center mb-6">
 								<p className="text-[11px] font-bold text-zinc-500 tracking-widest uppercase">Focus Analytics</p>
 								<span className="text-[10px] font-semibold text-[#00E5FF]">
-									{streak ? `${streak.changePercent > 0 ? "+" : ""}${streak.changePercent}% vs last month` : "+12% vs last week"}
+									{streak ? `${streak.changePercent > 0 ? "+" : ""}${streak.changePercent}% vs last month` : ""}
 								</span>
 							</div>
 							<div className="h-20 flex items-end justify-between gap-1.5 mb-4">
@@ -378,30 +350,20 @@ export default function Home() {
 											/>
 										);
 									})
-									: [30, 40, 20, 80, 60, 35, 70, 45, 65].map((h, i) => (
-										<div
-											key={i}
-											className="w-full rounded-sm"
-											style={{
-												height: `${h}%`,
-												backgroundColor: i >= 6 ? "#00E5FF" : "rgba(255,255,255,0.15)",
-												opacity: i >= 6 ? 0.8 : 1,
-											}}
-										/>
-									))
+									: <p className="text-xs text-zinc-500 flex items-center h-full">No focus data yet.</p>
 								}
 							</div>
 							<div className="flex justify-between mt-auto">
 								<div>
 									<p className="text-[10px] text-zinc-500 mb-0.5">Peak Focus</p>
 									<p className="text-sm text-white font-semibold">
-										{streak?.peakFocusHour ? `${streak.peakFocusHour}:00` : "10:15 AM"}
+										{streak?.peakFocusHour ? `${streak.peakFocusHour}:00` : "--"}
 									</p>
 								</div>
 								<div className="text-right">
 									<p className="text-[10px] text-zinc-500 mb-0.5">Deep Work</p>
 									<p className="text-sm text-white font-semibold">
-										{streak ? `${(streak.totalMinutes7d / 60).toFixed(1)}h` : "3.5h"}
+										{streak ? `${(streak.totalMinutes7d / 60).toFixed(1)}h` : "0h"}
 									</p>
 								</div>
 							</div>
