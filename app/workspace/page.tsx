@@ -59,6 +59,26 @@ export default function WorkspacePage() {
 		fetchContext();
 	}, []);
 
+	// Intercept tab close to ask for context
+	useEffect(() => {
+		if (!ctx?.hasActiveSession) return;
+
+		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+			// Trigger browser's default warning prompt
+			e.preventDefault();
+			e.returnValue = "";
+
+			// If the user clicks "Cancel" to stay on the page, the JavaScript thread resumes.
+			// We use a short timeout to catch that resumption and show our custom modal.
+			setTimeout(() => {
+				setShowPauseModal(true);
+			}, 100);
+		};
+
+		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+	}, [ctx?.hasActiveSession]);
+
 	const startSession = async () => {
 		if (!newTitle) return;
 		setIsStarting(true);
