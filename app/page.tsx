@@ -40,6 +40,7 @@ interface ContinuationData {
 	sessionTitle: string;
 	project: string | null;
 	elapsedMinutes: number;
+	elapsedSeconds: number;
 	pausePoint: string | null;
 	blockers: Array<{ id: number; type: string; description: string }>;
 	filesTouched: string[];
@@ -139,7 +140,7 @@ export default function Home() {
 							<h1 className="text-3xl font-semibold text-white tracking-tight">
 								You worked{" "}
 								<span className="text-[#00E5FF]">
-									{ctx?.elapsedMinutes
+									{ctx && ctx.sessionTitle !== "No previous session" && typeof ctx.elapsedMinutes === "number"
 										? `${(ctx.elapsedMinutes / 60).toFixed(1)}h`
 										: `${yesterdayHours}h`}
 								</span>{" "}
