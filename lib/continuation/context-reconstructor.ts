@@ -8,7 +8,7 @@ export interface ReconstructedContext {
 	hasActiveSession: boolean;
 	sessionTitle: string;
 	project?: string | null;
-	elapsedMinutes: number;
+	elapsedSeconds: number;
 	pausePoint?: string | null;
 	blockers: Activity[];
 	filesTouched: string[];
@@ -26,7 +26,7 @@ export async function reconstructContext(userId: number): Promise<ReconstructedC
 		return {
 			hasActiveSession: false,
 			sessionTitle: "No previous session",
-			elapsedMinutes: 0,
+			elapsedSeconds: 0,
 			pausePoint: null,
 			blockers: [],
 			filesTouched: [],
@@ -42,8 +42,8 @@ export async function reconstructContext(userId: number): Promise<ReconstructedC
 	// Calculate elapsed time
 	const startTime = session.startTime;
 	const endTime = session.endTime ?? new Date();
-	const elapsedMinutes = Math.round(
-		(endTime.getTime() - startTime.getTime()) / 60000,
+	const elapsedSeconds = Math.round(
+		(endTime.getTime() - startTime.getTime()) / 1000,
 	);
 
 	// Find pause point
@@ -69,7 +69,7 @@ export async function reconstructContext(userId: number): Promise<ReconstructedC
 		hasActiveSession: !!activeSession,
 		sessionTitle: session.title,
 		project: session.project,
-		elapsedMinutes,
+		elapsedSeconds,
 		pausePoint: pauseActivity?.description ?? null,
 		blockers,
 		filesTouched,

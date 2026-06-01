@@ -24,7 +24,7 @@ interface ContinuationData {
 	hasActiveSession: boolean;
 	sessionTitle: string;
 	project: string | null;
-	elapsedMinutes: number;
+	elapsedSeconds: number;
 	pausePoint: string | null;
 	blockers: Array<{ id: number; type: string; description: string; metadata?: Record<string, unknown> }>;
 	filesTouched: string[];
@@ -35,6 +35,7 @@ interface ContinuationData {
 export default function WorkspacePage() {
 	const [ctx, setCtx] = useState<ContinuationData | null>(null);
 	const [loading, setLoading] = useState(true); // only true on initial page load
+	const [activeSeconds, setActiveSeconds] = useState(0);
 	
 	// Start Session State
 	const [isStarting, setIsStarting] = useState(false);
@@ -51,7 +52,10 @@ export default function WorkspacePage() {
 		if (!silent) setLoading(true);
 		fetch("/api/continuation")
 			.then((res) => res.ok ? res.json() : null)
-			.then((data) => setCtx(data))
+			.then((data) => {
+				setCtx(data);
+				setActiveSeconds(data?.elapsedSeconds ?? 0);
+			})
 			.catch(() => {})
 			.finally(() => setLoading(false));
 	};
@@ -59,6 +63,14 @@ export default function WorkspacePage() {
 	useEffect(() => {
 		fetchContext(); // first load shows spinner
 	}, []);
+
+	useEffect(() => {
+		if (!ctx?.hasActiveSession) return;
+		const interval = setInterval(() => {
+			setActiveSeconds(prev => prev + 1);
+		}, 1000);
+		return () => clearInterval(interval);
+	}, [ctx?.hasActiveSession]);
 
 	// Show pause modal when user tries to close or refresh the tab
 	useEffect(() => {
@@ -131,8 +143,12 @@ export default function WorkspacePage() {
 	const files = ctx?.filesTouched ?? [];
 	const blockers = ctx?.blockers ?? [];
 	const steps = ctx?.nextSteps ?? [];
-	const minutes = ctx?.elapsedMinutes ?? 0;
-	const displayTime = `${Math.floor(minutes / 60).toString().padStart(2, "0")}:${(minutes % 60).toString().padStart(2, "0")}`;
+	
+	const displayTime = [
+		Math.floor(activeSeconds / 3600).toString().padStart(2, "0"),
+		Math.floor((activeSeconds % 3600) / 60).toString().padStart(2, "0"),
+		(activeSeconds % 60).toString().padStart(2, "0")
+	].join(":");
 
 	return (
 		<div className="flex flex-col min-h-screen bg-[#111111] text-zinc-300 font-sans relative">
